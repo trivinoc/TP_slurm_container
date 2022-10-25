@@ -87,7 +87,8 @@ RUN set -x \
     && /sbin/create-munge-key \
     && chmod 755 /run/munge \
     && mkdir -p /var/spool/slurmd \
-    && mkdir -p /var/spool/SLURM
+    && mkdir -p /var/spool/SLURM \
+    && chown slurm:slurm /var/spool/SLURM
 
 ADD supervisord.conf /etc/supervisord.conf
 
