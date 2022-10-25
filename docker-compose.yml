@@ -13,7 +13,6 @@ services:
             TZ: "Europe/Paris"
         volumes:
             - mariadb:/var/lib/mariadb
-        privileged: true
         networks: 
             - slurm
 
