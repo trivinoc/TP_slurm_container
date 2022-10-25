@@ -65,9 +65,9 @@ RUN set -x \
     && groupadd -r --gid=995 slurm \
     && useradd -r -g slurm --uid=995 slurm \
     && groupadd -r --gid=1001 bench1 \
-    && useradd -r -g slurm --uid=1001 bench1 \
+    && useradd -r -g bench1 --uid=1001 bench1 \
     && groupadd -r --gid=1002 bench2 \
-    && useradd -r -g slurm --uid=1002 bench2 \
+    && useradd -r -g bench2 --uid=1002 bench2 \
     && mkdir /etc/sysconfig/slurm \
         /var/spool/slurm \
         /var/run/slurm \
