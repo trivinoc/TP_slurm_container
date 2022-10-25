@@ -69,6 +69,40 @@ services:
         networks:
             - slurm
 
+    c3:
+        image: slurm:latest
+        hostname: c3
+        container_name: c3
+        privileged: true
+        volumes:
+            - munge:/etc/munge
+            - slurm_log:/var/log/slurm
+            - slurm_data:/var/lib/slurm
+            - ./config/slurm:/etc/slurm
+        expose:
+            - "6818"
+        depends_on:
+            - "slurm"
+        networks:
+            - slurm
+
+    c4:
+        image: slurm:latest
+        hostname: c4
+        container_name: c4
+        privileged: true
+        volumes:
+            - munge:/etc/munge
+            - slurm_log:/var/log/slurm
+            - slurm_data:/var/lib/slurm
+            - ./config/slurm:/etc/slurm
+        expose:
+            - "6818"
+        depends_on:
+            - "slurm"
+        networks:
+            - slurm
+
 networks:
   slurm:
 
