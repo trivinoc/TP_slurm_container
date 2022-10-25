@@ -14,8 +14,8 @@ LABEL org.label-schema.docker.cmd="docker-compose up -d"
 
 RUN echo -e "[mariadb]\n\
 name = MariaDB\n\
-baseurl = http://yum.mariadb.org/10.6/centos7-amd64\n\
-gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB\n\
+baseurl = https://archive.mariadb.org/mariadb-10.6/yum/centos7-amd64/\n\
+gpgkey=https://archive.mariadb.org/PublicKey\n\
 gpgcheck=1\
 " > /etc/yum.repos.d/mariadb.repo
 
@@ -64,6 +64,10 @@ RUN set -x \
     && rm -rf slurm \
     && groupadd -r --gid=995 slurm \
     && useradd -r -g slurm --uid=995 slurm \
+    && groupadd -r --gid=1001 bench1 \
+    && useradd -r -g slurm --uid=1001 bench1 \
+    && groupadd -r --gid=1002 bench2 \
+    && useradd -r -g slurm --uid=1002 bench2 \
     && mkdir /etc/sysconfig/slurm \
         /var/spool/slurm \
         /var/run/slurm \
