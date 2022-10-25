@@ -27,7 +27,7 @@ Launch a slurm network.
 $ docker network create slurm
 ```
 
-Then, ust start the cluster:
+Then, start the cluster:
 ```console
 $ docker-compose up -d
 Starting mariadb ... done
