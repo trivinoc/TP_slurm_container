@@ -20,7 +20,12 @@ slurm        latest     79739f328ae7   3 hours ago      1GB
 ```
 # setup cluster
 
-Configure your slurm.conf and slurmdbd.conf as needed and store them into the same directory as your docker-compose.yml. Of course, you can manage the configuration as you wish, but you will have to adapt the docker-compose.yml file.
+Configure your slurm.conf and slurmdbd.conf as needed and store them into the directory config/slurm. Of course, you can manage the configuration as you wish, but you will have to adapt the docker-compose.yml file.
+
+Launch a slurm network.
+```console
+$ docker network create slurm
+```
 
 Then, ust start the cluster:
 ```console
