@@ -45,9 +45,6 @@ RUN set -ex \
        MariaDB-client \
        MariaDB-devel \
        vim-enhanced \
-       libcgroup \
-       libcgroup-devel \
-       dbus-devel \
        openmpi3 \
     && yum clean all \
     && rm -rf /var/cache/yum
