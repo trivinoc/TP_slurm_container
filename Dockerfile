@@ -12,12 +12,12 @@ LABEL org.label-schema.description="Slurm POC container w/Centos 7"
 LABEL org.label-schema.version=$SLURM_VERSION
 LABEL org.label-schema.docker.cmd="docker-compose up -d"
 
-RUN echo -e "[mariadb]\n\
-name = MariaDB\n\
-baseurl = https://archive.mariadb.org/mariadb-11.3.2/yum/centos7-amd64/\n\
-gpgkey=https://archive.mariadb.org/PublicKey\n\
-gpgcheck=1\
-" > /etc/yum.repos.d/mariadb.repo
+#RUN echo -e "[mariadb]\n\
+#name = MariaDB\n\
+#baseurl = https://archive.mariadb.org/mariadb-11.3.2/yum/centos7-amd64/\n\
+#gpgkey=https://archive.mariadb.org/PublicKey\n\
+#gpgcheck=1\
+#" > /etc/yum.repos.d/mariadb.repo
 
 RUN set -ex \
     && yum makecache fast \
