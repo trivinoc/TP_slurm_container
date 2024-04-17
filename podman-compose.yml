@@ -1,0 +1,123 @@
+version: "1"
+services:
+  mariadb:
+    image: docker.io/library/mariadb:latest
+    hostname: mariadb
+    container_name: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: slurm_acct_db
+      MARIADB_USER: slurm
+      MARIADB_PASSWORD: password
+      TZ: "Europe/Paris"
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - slurm
+
+  slurm:
+    image: slurm:latest
+    hostname: slurm
+    container_name: slurm
+    privileged: true
+    volumes:
+      - munge:/etc/munge
+      - slurm_log:/var/log/slurm
+      - slurm_data:/var/lib/slurm
+      - slurm_statesaveloc:/var/spool/SLURM
+      - ./config/slurm:/etc/slurm
+      - ./home:/home
+      - workdir:/workdir
+    expose:
+      - "6819"
+    depends_on:
+      - mariadb
+    networks:
+      - slurm
+
+  c1:
+    image: slurm:latest
+    hostname: c1
+    container_name: c1
+    privileged: true
+    volumes:
+      - munge:/etc/munge
+      - slurm_log:/var/log/slurm
+      - slurm_data:/var/lib/slurm
+      - ./config/slurm:/etc/slurm
+      - ./home:/home
+      - workdir:/workdir
+    expose:
+      - "6817"
+    depends_on:
+      - "slurm"
+    networks:
+      - slurm
+
+  c2:
+    image: slurm:latest
+    hostname: c2
+    container_name: c2
+    privileged: true
+    volumes:
+      - munge:/etc/munge
+      - slurm_log:/var/log/slurm
+      - slurm_data:/var/lib/slurm
+      - ./config/slurm:/etc/slurm
+      - ./home:/home
+      - workdir:/workdir
+    expose:
+      - "6818"
+    depends_on:
+      - "slurm"
+    networks:
+      - slurm
+
+  c3:
+    image: slurm:latest
+    hostname: c3
+    container_name: c3
+    privileged: true
+    volumes:
+      - munge:/etc/munge
+      - slurm_log:/var/log/slurm
+      - slurm_data:/var/lib/slurm
+      - ./config/slurm:/etc/slurm
+      - ./home:/home
+      - workdir:/workdir
+    expose:
+      - "6818"
+    depends_on:
+      - "slurm"
+    networks:
+      - slurm
+
+  login:
+    image: slurm:latest
+    hostname: login
+    container_name: login
+    privileged: true
+    volumes:
+      - munge:/etc/munge
+      - ./config/slurm:/etc/slurm
+      - ./home:/home
+      - workdir:/workdir
+    expose:
+      - "6818"
+    depends_on:
+      - "slurm"
+    networks:
+      - slurm
+
+networks:
+  slurm:
+    driver: bridge
+
+volumes:
+  mysql:
+  munge:
+  slurm_log:
+  slurm_data:
+  slurm_statesaveloc:
+  home:
+  workdir:
