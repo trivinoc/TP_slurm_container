@@ -1,4 +1,4 @@
-ROM centos:7
+FROM centos:7
 
 LABEL maintener="myself"
 
