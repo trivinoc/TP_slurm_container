@@ -1,4 +1,4 @@
-FROM centos:7
+ROM centos:7
 
 LABEL maintener="myself"
 
@@ -14,7 +14,7 @@ LABEL org.label-schema.docker.cmd="docker-compose up -d"
 
 RUN echo -e "[mariadb]\n\
 name = MariaDB\n\
-baseurl = https://archive.mariadb.org/mariadb-10.6/yum/centos7-amd64/\n\
+baseurl = https://archive.mariadb.org/mariadb-11.3.2/yum/centos7-amd64/\n\
 gpgkey=https://archive.mariadb.org/PublicKey\n\
 gpgcheck=1\
 " > /etc/yum.repos.d/mariadb.repo
@@ -45,12 +45,17 @@ RUN set -ex \
        MariaDB-client \
        MariaDB-devel \
        vim-enhanced \
+       libcgroup \
+       libcgroup-devel \
+       dbus-devel \
+       openmpi3 \
     && yum clean all \
     && rm -rf /var/cache/yum
 
 RUN ln -s /usr/bin/python3.4 /usr/bin/python3
 
 RUN pip install Cython nose && pip3.4 install Cython nose
+
 
 RUN set -x \
     && git clone https://github.com/SchedMD/slurm.git \
@@ -62,12 +67,12 @@ RUN set -x \
     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
     && popd \
     && rm -rf slurm \
-    && groupadd -r --gid=995 slurm \
-    && useradd -r -g slurm --uid=995 slurm \
-    && groupadd -r --gid=1001 bench1 \
-    && useradd -r -g bench1 --uid=1001 bench1 \
-    && groupadd -r --gid=1002 bench2 \
-    && useradd -r -g bench2 --uid=1002 bench2 \
+    && groupadd -r --gid=911 slurm \
+    && useradd -r -g slurm --uid=911 slurm \
+    && groupadd -r --gid=1011 bench1 \
+    && useradd -r -g bench1 --uid=1011 bench1 \
+    && groupadd -r --gid=1012 bench2 \
+    && useradd -r -g bench2 --uid=1012 bench2 \
     && mkdir /etc/sysconfig/slurm \
         /var/spool/slurm \
         /var/run/slurm \
@@ -88,7 +93,18 @@ RUN set -x \
     && chmod 755 /run/munge \
     && mkdir -p /var/spool/slurmd \
     && mkdir -p /var/spool/SLURM \
-    && chown slurm:slurm /var/spool/SLURM
+    && chown slurm:slurm /var/spool/SLURM \
+    && mkdir -p /etc/slurm/ \
+    && touch /etc/slurm/slurm.conf \
+    && touch /etc/slurm/slurmdbd.conf \
+    && touch /etc/slurm/partition.conf \
+    && chown slurm:slurm /etc/slurm/*.conf \
+    && chmod 644 /etc/slurm/slurm.conf \
+    && chmod 600 /etc/slurm/slurmdbd.conf \
+    && chmod 644 /etc/slurm/partition.conf
+
+RUN echo 'alias sacct_="\sacct -D --format=jobid%-13,user%-12,jobname%-35,submit,timelimit,partition,qos,nnodes,start,end,elapsed,state,exitcode%-6,Derivedexitcode%-6,nodelist%-200 "' >> /root/.bashrc \
+    && echo 'alias sinfo_="\sinfo --format=\"%100E %12U %19H %6t %N\" "' >> /root/.bashrc
 
 ADD supervisord.conf /etc/supervisord.conf
 
