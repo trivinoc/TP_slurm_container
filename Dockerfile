@@ -47,6 +47,7 @@ RUN set -ex \
        MariaDB-devel \
        vim-enhanced \
        openmpi3 \
+       openmpi3-devel \
     && yum clean all \
     && rm -rf /var/cache/yum
 
