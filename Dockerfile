@@ -24,6 +24,7 @@ RUN set -ex \
     && yum -y update \
     && yum -y install epel-release \
     && yum -y install \
+       man-db \
        wget \
        bzip2 \
        perl \
