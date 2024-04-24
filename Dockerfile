@@ -24,7 +24,6 @@ RUN set -ex \
     && yum -y update \
     && yum -y install epel-release \
     && yum -y install \
-       man-db \
        wget \
        bzip2 \
        perl \
@@ -47,7 +46,6 @@ RUN set -ex \
        MariaDB-devel \
        vim-enhanced \
        openmpi3 \
-       openmpi3-devel \
     && yum clean all \
     && rm -rf /var/cache/yum
 
@@ -108,3 +106,4 @@ RUN echo 'alias sacct_="\sacct -D --format=jobid%-13,user%-12,jobname%-35,submit
 ADD supervisord.conf /etc/supervisord.conf
 
 ENTRYPOINT ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]
+
