@@ -16,7 +16,7 @@ services:
       - slurm
 
   slurm:
-    image: slurm-23:latest
+    image: slurm:latest
     hostname: slurm
     container_name: slurm
     privileged: true
@@ -37,7 +37,7 @@ services:
       - slurm
 
   c1:
-    image: slurm-23:latest
+    image: slurm:latest
     hostname: c1
     container_name: c1
     privileged: true
@@ -57,7 +57,7 @@ services:
       - slurm
 
   c2:
-    image: slurm-23:latest
+    image: slurm:latest
     hostname: c2
     container_name: c2
     privileged: true
@@ -77,7 +77,7 @@ services:
       - slurm
 
   c3:
-    image: slurm-23:latest
+    image: slurm:latest
     hostname: c3
     container_name: c3
     privileged: true
@@ -97,7 +97,7 @@ services:
       - slurm
 
   login:
-    image: slurm-23:latest
+    image: slurm:latest
     hostname: login
     container_name: login
     privileged: true
