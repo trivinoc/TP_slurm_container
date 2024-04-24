@@ -25,6 +25,7 @@ RUN set -ex \
     && yum -y install epel-release \
     && yum -y install \
        wget \
+       man-db \
        bzip2 \
        perl \
        gcc \
@@ -46,6 +47,7 @@ RUN set -ex \
        MariaDB-devel \
        vim-enhanced \
        openmpi3 \
+       openmpi3-devel \
     && yum clean all \
     && rm -rf /var/cache/yum
 
