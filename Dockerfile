@@ -1,4 +1,4 @@
-FROM centos:7
+FROM almalinux:9
 
 LABEL maintener="myself"
 
@@ -8,22 +8,25 @@ ARG SLURM_VERSION
 LABEL org.label-schema.build-date=$BUILD_DATE
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.name="slurm/"$SLURM_VERSION
-LABEL org.label-schema.description="Slurm POC container w/Centos 7"
+LABEL org.label-schema.description="Slurm POC container w/AlmaLinux 9"
 LABEL org.label-schema.version=$SLURM_VERSION
 LABEL org.label-schema.docker.cmd="docker-compose up -d"
 
 RUN echo -e "[mariadb]\n\
 name = MariaDB\n\
-baseurl = https://archive.mariadb.org/mariadb-11.3.2/yum/centos7-amd64/\n\
+baseurl = https://archive.mariadb.org/mariadb-11.3.2/yum/almalinux9-amd64\n\
 gpgkey=https://archive.mariadb.org/PublicKey\n\
 gpgcheck=1\
 " > /etc/yum.repos.d/mariadb.repo
 
+RUN dnf install -y epel-release \
+    && dnf config-manager --set-enabled crb
+    
 RUN set -ex \
-    && yum makecache fast \
-    && yum -y update \
-    && yum -y install epel-release \
-    && yum -y install \
+    && dnf makecache fast \
+    && dnf -y update \
+    && dnf -y install epel-release \
+    && dnf -y install \
        wget \
        man-db \
        bzip2 \
@@ -34,26 +37,27 @@ RUN set -ex \
        gnupg \
        make \
        munge \
+       munge-libs \
        munge-devel \
        python-devel \
        python-pip \
-       python34 \
-       python34-devel \
-       python34-pip \
+       python3 \
+       python3-devel \
+       python3-pip \
        psmisc \
        bash-completion \
        supervisor \
        MariaDB-client \
        MariaDB-devel \
        vim-enhanced \
-       openmpi3 \
-       openmpi3-devel \
-    && yum clean all \
+       openmpi \
+       openmpi-devel \
+    && dnf clean all \
     && rm -rf /var/cache/yum
 
-RUN ln -s /usr/bin/python3.4 /usr/bin/python3
+#RUN ln -s /usr/bin/python3.4 /usr/bin/python3
 
-RUN pip install Cython nose && pip3.4 install Cython nose
+RUN pip install Cython nose && pip3 install Cython nose
 
 
 RUN set -x \
