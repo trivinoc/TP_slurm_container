@@ -23,7 +23,7 @@ RUN dnf install -y epel-release \
     && dnf config-manager --set-enabled crb
     
 RUN set -ex \
-    && dnf makecache fast \
+    && dnf makecache timer \
     && dnf -y update \
     && dnf -y install epel-release \
     && dnf -y install \
@@ -54,7 +54,7 @@ RUN set -ex \
        openmpi \
        openmpi-devel \
     && dnf clean all \
-    && rm -rf /var/cache/yum
+    && rm -rf /var/cache/dnf
 
 #RUN ln -s /usr/bin/python3.4 /usr/bin/python3
 
