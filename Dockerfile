@@ -47,6 +47,7 @@ RUN set -ex \
        psmisc \
        bash-completion \
        supervisor \
+       sudo \
        MariaDB-client \
        MariaDB-devel \
        vim-enhanced \
