@@ -38,11 +38,22 @@ Starting c1      ... done
 
 In order to get access to one of the container, you will have to exec a bash into the one you like to shell, e.g:
 ```console
-$ podman-compose exec c1 bash
+$ podman-compose exec slurm bash
 [root@c1 /]# sinfo
 PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
 short*       up   infinite      1  idle~ c1
 lon g        up   infinite      0    n/a
 [root@c1 /]#
 ```
+# Quick example 
+
+To ensure that slurm is working, you can run a quick job, e.g :
+```console
+[root@slurm /]# srun -N 2 hostname
+c1
+c2
+```
+
+
+
 
