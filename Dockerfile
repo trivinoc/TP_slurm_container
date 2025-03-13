@@ -53,6 +53,8 @@ RUN set -ex \
        vim-enhanced \
        openmpi \
        openmpi-devel \
+       pmix \
+       pmix-devel \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
@@ -66,7 +68,7 @@ RUN set -x \
     && pushd slurm \
     && git checkout tags/${SLURM_VERSION} \
     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
-        --with-mysql_config=/usr/bin  --libdir=/usr/lib64 \
+        --with-mysql_config=/usr/bin  --libdir=/usr/lib64 --with-pmix\
     && make install \
     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
     && popd \
@@ -108,7 +110,9 @@ RUN set -x \
     && chmod 644 /etc/slurm/partition.conf
 
 RUN echo 'alias sacct_="\sacct -D --format=jobid%-13,user%-12,jobname%-35,submit,timelimit,partition,qos,nnodes,start,end,elapsed,state,exitcode%-6,Derivedexitcode%-6,nodelist%-200 "' >> /root/.bashrc \
-    && echo 'alias sinfo_="\sinfo --format=\"%100E %12U %19H %6t %N\" "' >> /root/.bashrc
+    && echo 'alias sinfo_="\sinfo --format=\"%100E %12U %19H %6t %N\" "' >> /root/.bashrc \
+    && echo 'export PATH=/usr/lib64/openmpi/bin:$PATH' >> /root/.bashrc \
+    && echo 'export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH' >> /root/.bashrc 
 
 ADD supervisord.conf /etc/supervisord.conf
 
