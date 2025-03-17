@@ -32,6 +32,7 @@ RUN set -ex \
        bzip2 \
        perl \
        gcc \
+       gfortran \
        gcc-c++\
        git \
        gnupg \
@@ -51,10 +52,12 @@ RUN set -ex \
        MariaDB-client \
        MariaDB-devel \
        vim-enhanced \
-       openmpi \
-       openmpi-devel \
+       autoconf \
+       automake \
+       libtool \
        pmix \
        pmix-devel \
+       flex\
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
@@ -62,6 +65,18 @@ RUN set -ex \
 
 RUN pip install Cython nose && pip3 install Cython nose
 
+RUN set -x\
+    && git clone https://github.com/open-mpi/ompi.git \
+    && pushd ompi \
+    && git fetch --tags \
+    && git checkout v4.1.1 \
+    && ./autogen.pl \
+    && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/ompi \
+        --libdir=/usr/lib64 --enable-mpi-fortran --with-pmix \
+    && make -j 8 \
+    && make install \
+    && popd \
+    && rm -rf ompi
 
 RUN set -x \
     && git clone https://github.com/SchedMD/slurm.git \
@@ -69,6 +84,7 @@ RUN set -x \
     && git checkout tags/${SLURM_VERSION} \
     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
         --with-mysql_config=/usr/bin  --libdir=/usr/lib64 --with-pmix\
+    && make -j 8\
     && make install \
     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
     && popd \
@@ -109,9 +125,10 @@ RUN set -x \
     && chmod 600 /etc/slurm/slurmdbd.conf \
     && chmod 644 /etc/slurm/partition.conf
 
+
 RUN echo 'alias sacct_="\sacct -D --format=jobid%-13,user%-12,jobname%-35,submit,timelimit,partition,qos,nnodes,start,end,elapsed,state,exitcode%-6,Derivedexitcode%-6,nodelist%-200 "' >> /root/.bashrc \
     && echo 'alias sinfo_="\sinfo --format=\"%100E %12U %19H %6t %N\" "' >> /root/.bashrc \
-    && echo 'export PATH=/usr/lib64/openmpi/bin:$PATH' >> /root/.bashrc \
+    && echo 'export PATH=/usr/lib63/openmpi/bin:$PATH' >> /root/.bashrc \
     && echo 'export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH' >> /root/.bashrc 
 
 ADD supervisord.conf /etc/supervisord.conf
