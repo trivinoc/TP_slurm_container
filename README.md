@@ -14,7 +14,7 @@ uid=1000(marvin) gid=1000(marvin) groups=1000(marvin),999(docker)
 ```
 Build the container:
 ```
-$ podman build --no-cache=true --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') --build-arg SLURM_VERSION=slurm-24-11-2-1 -t slurm:latest .
+$ podman build --no-cache=true --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') --build-arg OMPI_VERSION=v4.1.1 SLURM_VERSION=slurm-24-11-2-1 -t slurm:latest .
 $ podman image ls
 slurm        latest     79739f328ae7   3 hours ago      1GB
 ```
