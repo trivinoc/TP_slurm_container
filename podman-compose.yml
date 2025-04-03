@@ -158,7 +158,26 @@ services:
     networks:
       - slurm
 
-
+  grafana:
+    image: docker.io/grafana/grafana:latest
+    hostname: grafana
+    container_name: grafana
+    volumes:
+      - slurm_log:/var/log/slurm:ro
+    depends_on:
+      - elasticsearch
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/graphana
+    depends_on:
+      - elasticsearch
+    networks:
+      - slurm
+        
 networks:
   slurm:
     driver: bridge
@@ -173,4 +192,5 @@ volumes:
   home:
   workdir:
   elasticsearch_data:
+  grafana_data:
 
