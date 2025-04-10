@@ -1,4 +1,4 @@
-FROM centos:7
+FROM almalinux:9
 
 LABEL maintener="myself"
 
@@ -8,60 +8,83 @@ ARG SLURM_VERSION
 LABEL org.label-schema.build-date=$BUILD_DATE
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.name="slurm/"$SLURM_VERSION
-LABEL org.label-schema.description="Slurm POC container w/Centos 7"
+LABEL org.label-schema.description="Slurm POC container w/AlmaLinux 9"
 LABEL org.label-schema.version=$SLURM_VERSION
 LABEL org.label-schema.docker.cmd="docker-compose up -d"
 
 RUN echo -e "[mariadb]\n\
 name = MariaDB\n\
-baseurl = https://archive.mariadb.org/mariadb-11.3.2/yum/centos7-amd64/\n\
+baseurl = https://archive.mariadb.org/mariadb-11.3.2/yum/almalinux9-amd64\n\
 gpgkey=https://archive.mariadb.org/PublicKey\n\
 gpgcheck=1\
 " > /etc/yum.repos.d/mariadb.repo
 
+RUN dnf install -y epel-release \
+    && dnf config-manager --set-enabled crb
+    
 RUN set -ex \
-    && yum makecache fast \
-    && yum -y update \
-    && yum -y install epel-release \
-    && yum -y install \
+    && dnf makecache timer \
+    && dnf -y update \
+    && dnf -y install epel-release \
+    && dnf -y install \
        wget \
        man-db \
        bzip2 \
        perl \
        gcc \
+       gfortran \
        gcc-c++\
        git \
        gnupg \
        make \
        munge \
+       munge-libs \
        munge-devel \
        python-devel \
        python-pip \
-       python34 \
-       python34-devel \
-       python34-pip \
+       python3 \
+       python3-devel \
+       python3-pip \
        psmisc \
        bash-completion \
        supervisor \
+       sudo \
        MariaDB-client \
        MariaDB-devel \
        vim-enhanced \
-       openmpi3 \
-       openmpi3-devel \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+       autoconf \
+       automake \
+       libtool \
+       pmix \
+       pmix-devel \
+       flex\
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
 
-RUN ln -s /usr/bin/python3.4 /usr/bin/python3
+#RUN ln -s /usr/bin/python3.4 /usr/bin/python3
 
-RUN pip install Cython nose && pip3.4 install Cython nose
+RUN pip install Cython nose && pip3 install Cython nose
 
+RUN set -x\
+    && git clone https://github.com/open-mpi/ompi.git \
+    && pushd ompi \
+    && git fetch --tags \
+    && git checkout v4.1.1 \
+    && ./autogen.pl \
+    && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/ompi \
+        --libdir=/usr/lib64 --enable-mpi-fortran --with-pmix \
+    && make -j 8 \
+    && make install \
+    && popd \
+    && rm -rf ompi
 
 RUN set -x \
     && git clone https://github.com/SchedMD/slurm.git \
     && pushd slurm \
     && git checkout tags/${SLURM_VERSION} \
     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
-        --with-mysql_config=/usr/bin  --libdir=/usr/lib64 \
+        --with-mysql_config=/usr/bin  --libdir=/usr/lib64 --with-pmix\
+    && make -j 8\
     && make install \
     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
     && popd \
@@ -102,8 +125,11 @@ RUN set -x \
     && chmod 600 /etc/slurm/slurmdbd.conf \
     && chmod 644 /etc/slurm/partition.conf
 
+
 RUN echo 'alias sacct_="\sacct -D --format=jobid%-13,user%-12,jobname%-35,submit,timelimit,partition,qos,nnodes,start,end,elapsed,state,exitcode%-6,Derivedexitcode%-6,nodelist%-200 "' >> /root/.bashrc \
-    && echo 'alias sinfo_="\sinfo --format=\"%100E %12U %19H %6t %N\" "' >> /root/.bashrc
+    && echo 'alias sinfo_="\sinfo --format=\"%100E %12U %19H %6t %N\" "' >> /root/.bashrc \
+    && echo 'export PATH=/usr/lib63/openmpi/bin:$PATH' >> /root/.bashrc \
+    && echo 'export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:$LD_LIBRARY_PATH' >> /root/.bashrc 
 
 ADD supervisord.conf /etc/supervisord.conf
 

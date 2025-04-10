@@ -114,7 +114,70 @@ services:
       - "slurm"
     networks:
       - slurm
+  
+  elasticsearch:
+    image: docker.io/library/elasticsearch:8.17.3
+    hostname: elasticsearch
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - ELASTIC_PASSWORD=changeme
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - slurm
+ 
+  logstash:
+    image: docker.io/library/logstash:8.17.3
+    hostname: logstash
+    container_name: logstash
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - slurm_log:/var/log/slurm:ro
+    ports:
+      - "50000:50000/udp"
+    depends_on:
+      - elasticsearch
+    networks:
+      - slurm
 
+  kibana:
+    image: docker.io/library/kibana:8.17.3
+    hostname: kibana
+    container_name: kibana
+    volumes:
+      - slurm_log:/var/log/slurm:ro
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    networks:
+      - slurm
+
+  grafana:
+    image: docker.io/grafana/grafana:latest
+    hostname: grafana
+    container_name: grafana
+    volumes:
+      - slurm_log:/var/log/slurm:ro
+    depends_on:
+      - elasticsearch
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/graphana
+    depends_on:
+      - elasticsearch
+    networks:
+      - slurm
+        
 networks:
   slurm:
     driver: bridge
@@ -128,4 +191,6 @@ volumes:
   nhc:
   home:
   workdir:
+  elasticsearch_data:
+  grafana_data:
 
